@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IPL 2026 – AI Match Predictions & Live Stats</title>
+  <meta name="description" content="AI-powered IPL 2026 match-by-match winner predictions updated with live tournament data." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@700;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #060910;
+      --surface:   #0d1320;
+      --surface2:  #141d31;
+      --border:    rgba(255,255,255,0.07);
+      --accent:    #f97316;
+      --accent2:   #facc15;
+      --accent3:   #a78bfa;
+      --text:      #f1f5f9;
+      --muted:     #94a3b8;
+      --win:       #22c55e;
+      --lose:      #ef4444;
+      --close:     #f59e0b;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Background glow orbs ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: -1;
+      background:
+        radial-gradient(ellipse 60% 40% at 20% 10%, rgba(249,115,22,0.08) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 40% at 80% 80%, rgba(167,139,250,0.07) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 30% at 60% 30%, rgba(250,204,21,0.04) 0%, transparent 70%);
+    }
+
+    /* ── Header ── */
+    header {
+      text-align: center;
+      padding: 3.5rem 1rem 2rem;
+      position: relative;
+    }
+    .badge {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.4);
+      color: #4ade80; font-size: 0.75rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 0.3rem 0.9rem; border-radius: 9999px; margin-bottom: 1.2rem;
+    }
+    .badge::before { content: '●'; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    h1 {
+      font-family: 'Orbitron', monospace;
+      font-size: clamp(2rem, 5vw, 3.8rem);
+      font-weight: 900;
+      line-height: 1.1;
+      background: linear-gradient(135deg, #f97316, #facc15 40%, #a78bfa);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .subtitle {
+      margin-top: 0.8rem; color: var(--muted); font-size: 1rem; font-weight: 400;
+    }
+
+    /* ── Nav Tabs ── */
+    .tabs {
+      display: flex; justify-content: center; gap: 1rem;
+      margin-bottom: 2rem; flex-wrap: wrap; padding: 0 1rem;
+    }
+    .tab-btn {
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--muted); padding: 0.75rem 1.5rem; border-radius: 2rem;
+      font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.2s;
+    }
+    .tab-btn:hover { background: var(--surface2); color: var(--text); }
+    .tab-btn.active {
+      background: rgba(249,115,22,0.15); border-color: var(--accent);
+      color: var(--accent);
+    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; animation: fadeUp 0.4s ease both; }
+
+    /* ── Stats bar ── */
+    .stats-bar {
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem;
+      padding: 0 1rem 2.5rem;
+    }
+    .stat-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 1rem; padding: 1rem 1.5rem; text-align: center;
+      min-width: 140px;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .stat-card:hover { transform: translateY(-2px); border-color: rgba(249,115,22,0.4); }
+    .stat-value {
+      font-size: 1.6rem; font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .stat-label { font-size: 0.72rem; color: var(--muted); margin-top: 0.2rem; text-transform: uppercase; letter-spacing: 0.06em; }
+
+    /* ── Controls ── */
+    .controls {
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 0.8rem;
+      padding: 0 1rem 2rem;
+    }
+    .controls input, .controls select, .filter-btn {
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--text); padding: 0.65rem 1rem; border-radius: 0.75rem;
+      font-family: inherit; font-size: 0.9rem; outline: none;
+      transition: border-color 0.2s;
+      appearance: auto;
+    }
+    .controls input:focus, .controls select:focus { border-color: var(--accent); }
+    .controls input { min-width: 220px; }
+    .filter-btn { cursor: pointer; color: var(--muted); }
+    .filter-btn:hover, .filter-btn.active {
+      background: rgba(249,115,22,0.15); border-color: var(--accent);
+      color: var(--accent); font-weight: 600;
+    }
+
+    /* ── Main container ── */
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 1rem 4rem; }
+
+    /* ── Day group header ── */
+    .day-header {
+      display: flex; align-items: center; gap: 1rem;
+      margin: 2.5rem 0 1rem;
+    }
+    .day-header h2 {
+      font-size: 0.78rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted);
+      white-space: nowrap;
+    }
+    .day-header-line { flex: 1; height: 1px; background: var(--border); }
+    .day-pill {
+      background: rgba(249,115,22,0.12); border: 1px solid rgba(249,115,22,0.3);
+      color: var(--accent); font-size: 0.7rem; font-weight: 700;
+      padding: 0.2rem 0.7rem; border-radius: 9999px; white-space: nowrap;
+    }
+
+    /* ── Match card ── */
+    .match-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 1.25rem; padding: 0; margin-bottom: 1rem;
+      overflow: hidden; transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+      cursor: default; position: relative;
+    }
+    .match-card:hover {
+      transform: translateY(-3px); border-color: rgba(249,115,22,0.35);
+      box-shadow: 0 8px 40px rgba(249,115,22,0.12);
+    }
+    .match-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: var(--stripe-color, var(--accent));
+      border-radius: 1.25rem 1.25rem 0 0;
+    }
+    .card-top {
+      display: grid; grid-template-columns: 1fr auto 1fr;
+      align-items: center; gap: 0.5rem; padding: 1.4rem 1.4rem 1rem;
+    }
+    .team-block { display: flex; flex-direction: column; gap: 0.3rem; }
+    .team-block.home { align-items: flex-start; }
+    .team-block.away { align-items: flex-end; text-align: right; }
+    .team-logo {
+      width: 52px; height: 52px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; border: 2px solid var(--border); flex-shrink: 0;
+    }
+    .team-name { font-size: 0.88rem; font-weight: 700; color: var(--text); line-height: 1.2; }
+    .team-role { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+    .team-form-bar { font-size: 0.7rem; color: var(--muted); }
+    .vs-center { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; }
+    .vs-text {
+      font-family: 'Orbitron', monospace; font-size: 1rem; font-weight: 700;
+      color: var(--muted); letter-spacing: 0.05em;
+    }
+    .match-no-badge {
+      font-size: 0.65rem; color: var(--text); font-weight: 600;
+      background: var(--surface2); border: 1px solid var(--border);
+      padding: 0.2rem 0.5rem; border-radius: 9999px;
+    }
+    .time-badge { font-size: 0.65rem; color: var(--muted); }
+
+    /* Result Banner for completed matches */
+    .result-banner {
+      background: rgba(255,255,255,0.03); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      padding: 0.6rem 1.4rem; text-align: center; font-size: 0.8rem; font-weight: 600;
+    }
+    .result-correct { color: #4ade80; }
+    .result-incorrect { color: #f87171; }
+
+    /* Probability bar */
+    .prob-section { padding: 0.3rem 1.4rem 0; }
+    .prob-bar-wrap { display: flex; align-items: center; gap: 0.5rem; }
+    .prob-label { font-size: 0.65rem; color: var(--muted); white-space: nowrap; }
+    .prob-bar { flex: 1; height: 7px; background: var(--surface2); border-radius: 9999px; overflow: hidden; }
+    .prob-fill-home { height: 100%; border-radius: 9999px; transition: width 0.6s ease; }
+    .prob-fill-away { height: 100%; border-radius: 9999px; transition: width 0.6s ease; }
+
+    /* Card footer */
+    .card-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.9rem 1.4rem; border-top: 1px solid var(--border);
+      margin-top: 0.9rem; flex-wrap: wrap; gap: 0.5rem;
+    }
+    .winner-chip {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.4rem 0.9rem; border-radius: 9999px; font-size: 0.78rem; font-weight: 700;
+    }
+    .winner-chip.pred { background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); color: #4ade80; }
+    .winner-chip.actual { background: rgba(249,115,22,0.15); border: 1px solid rgba(249,115,22,0.3); color: #f97316; }
+
+    .confidence-chip { font-size: 0.72rem; font-weight: 700; padding: 0.3rem 0.7rem; border-radius: 9999px; border: 1px solid var(--border); }
+    .conf-high   { background: rgba(34,197,94,0.1);  color: #4ade80; border-color: rgba(34,197,94,0.3); }
+    .conf-medium { background: rgba(245,158,11,0.1); color: #fbbf24; border-color: rgba(245,158,11,0.3); }
+    .conf-low    { background: rgba(167,139,250,0.1);color: #c4b5fd; border-color: rgba(167,139,250,0.3); }
+    .venue-chip { font-size: 0.65rem; color: var(--muted); }
+
+    /* ── Datatables (Points, Player Stats) ── */
+    .data-table {
+      width: 100%; border-collapse: collapse; text-align: left;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 1rem; overflow: hidden;
+    }
+    .data-table th, .data-table td { padding: 1rem; border-bottom: 1px solid var(--border); }
+    .data-table th { background: var(--surface2); color: var(--muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    .data-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .data-table tr:last-child td { border-bottom: none; }
+    .team-cell { display: flex; align-items: center; gap: 0.6rem; font-weight: 600; }
+
+    /* Layout */
+    .layout { display: grid; grid-template-columns: 1fr 300px; gap: 2rem; align-items: start; }
+    @media(max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+    .sidebar { position: sticky; top: 1.5rem; display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-card { background: var(--surface); border: 1px solid var(--border); border-radius: 1.25rem; overflow: hidden; }
+    .sidebar-title {
+      padding: 1rem 1.2rem; font-size: 0.75rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted);
+      border-bottom: 1px solid var(--border); background: var(--surface2);
+    }
+    .leaderboard-row {
+      display: flex; align-items: center; gap: 0.8rem;
+      padding: 0.75rem 1.2rem; border-bottom: 1px solid var(--border);
+    }
+    .leaderboard-row:last-child { border-bottom: none; }
+    .lb-rank { font-size: 0.75rem; font-weight: 800; color: var(--muted); width: 18px; }
+    .lb-rank.gold { color: #facc15; } .lb-rank.silver { color: #94a3b8; } .lb-rank.bronze { color: #c2794e; }
+    .lb-logo { font-size: 1.1rem; } .lb-team { flex: 1; font-size: 0.8rem; font-weight: 600; }
+    .lb-val { font-size: 0.85rem; font-weight: 800; }
+
+    /* Orange/Purple Caps */
+    .cap-container { padding: 1.2rem; display: flex; align-items: center; gap: 1rem; }
+    .cap-icon { font-size: 2rem; }
+    .cap-details { flex: 1; }
+    .cap-name { font-weight: 700; font-size: 0.9rem; color: var(--text); }
+    .cap-team { font-size: 0.75rem; color: var(--muted); }
+    .cap-stat { font-weight: 800; font-size: 1.2rem; }
+    .cap-orange { color: #f97316; } .cap-purple { color: #a78bfa; }
+
+    /* Squads Grid */
+    .squads-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; }
+    .squad-card { background: var(--surface); border: 1px solid var(--border); border-radius: 1rem; padding: 1.5rem; }
+    .squad-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+    .squad-header h3 { font-size: 1.1rem; }
+    .squad-list { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
+    .squad-list strong { color: var(--text); }
+    .squad-rating { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); display: flex; gap: 1rem; }
+    .rating-item { flex: 1; text-align: center; }
+    .rating-val { font-size: 1.2rem; font-weight: 800; color: var(--accent2); }
+    .rating-lbl { font-size: 0.65rem; text-transform: uppercase; }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200;
+      display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 1.5rem; padding: 2rem; max-width: 480px; width: 92%; max-height: 90vh; overflow-y: auto;
+      transform: scale(0.9); transition: transform 0.2s;
+    }
+    .modal-overlay.open .modal { transform: scale(1); }
+    .modal-close { float: right; background: none; border: none; color: var(--muted); font-size: 1.3rem; cursor: pointer; }
+    .modal-stat-row { display: flex; justify-content: space-between; padding: 0.6rem 0; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
+    .modal-stat-key { color: var(--muted); } .modal-stat-val { font-weight: 700; text-align: right; }
+
+    #scrollTop {
+      position: fixed; bottom: 2rem; right: 2rem; z-index: 99; width: 44px; height: 44px; border-radius: 50%;
+      background: var(--accent); border: none; cursor: pointer; color: white; display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; box-shadow: 0 4px 20px rgba(249,115,22,0.4); opacity: 0; pointer-events: none; transition: 0.3s;
+    }
+    #scrollTop.visible { opacity: 1; pointer-events: all; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="badge">🏏 LIVE 2026 Season Data</div>
+  <h1>IPL 2026 Hub</h1>
+  <p class="subtitle">AI Predictions • Live Standings • Player Stats • Squads</p>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('predictions')">AI Predictions</button>
+  <button class="tab-btn" onclick="switchTab('standings')">Points Table</button>
+  <button class="tab-btn" onclick="switchTab('stats')">Player Stats</button>
+  <button class="tab-btn" onclick="switchTab('squads')">Squads & Ratings</button>
+</div>
+
+<div class="stats-bar" id="statsBar"></div>
+
+<div class="container">
+  
+  <!-- PREDICTIONS TAB -->
+  <div id="tab-predictions" class="tab-content active">
+    <div class="controls">
+      <input type="text" id="searchInput" placeholder="🔍 Search team or venue…" oninput="renderMatches()" />
+      <select id="statusFilter" onchange="renderMatches()">
+        <option value="">All Matches</option>
+        <option value="upcoming">Upcoming Only</option>
+        <option value="completed">Completed Only</option>
+      </select>
+      <select id="teamFilter" onchange="renderMatches()"><option value="">All Teams</option></select>
+    </div>
+    <div class="layout">
+      <div id="matchesContainer"></div>
+      <div class="sidebar">
+        <div class="sidebar-card">
+          <div class="sidebar-title">🔮 Predicted Final Standings</div>
+          <div id="leaderboard"></div>
+        </div>
+        <div class="sidebar-card">
+          <div class="sidebar-title">🤖 Model Performance</div>
+          <div id="modelInfo" style="padding:1.2rem;font-size:0.85rem;line-height:1.6;color:var(--text);"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STANDINGS TAB -->
+  <div id="tab-standings" class="tab-content">
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:1rem; padding:1.5rem; overflow-x:auto;">
+      <h2 style="margin-bottom:1rem; font-size:1.2rem;">Official IPL 2026 Points Table</h2>
+      <table class="data-table" id="pointsTable">
+        <thead><tr><th>Team</th><th>M</th><th>W</th><th>L</th><th>Pts</th><th>NRR</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- STATS TAB -->
+  <div id="tab-stats" class="tab-content">
+    <div class="layout">
+      <div>
+        <h2 style="margin-bottom:1rem; font-size:1.2rem;">🏏 Top Run Scorers (Orange Cap)</h2>
+        <table class="data-table" id="battersTable">
+          <thead><tr><th>Player</th><th>Team</th><th>M</th><th>Runs</th><th>SR</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="sidebar">
+        <div class="sidebar-card">
+          <div class="sidebar-title">🟠 Current Orange Cap</div>
+          <div id="orangeCap" class="cap-container"></div>
+        </div>
+        <div class="sidebar-card">
+          <div class="sidebar-title">🟣 Current Purple Cap</div>
+          <div id="purpleCap" class="cap-container"></div>
+        </div>
+        <h2 style="margin:1rem 0 0.5rem; font-size:1.1rem;">🏟️ Top Wicket Takers</h2>
+        <table class="data-table" id="bowlersTable">
+          <thead><tr><th>Player</th><th>Team</th><th>W</th><th>Eco</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- SQUADS TAB -->
+  <div id="tab-squads" class="tab-content">
+    <div class="squads-grid" id="squadsContainer"></div>
+  </div>
+
+</div>
+
+<button id="scrollTop" onclick="window.scrollTo(0,0)">↑</button>
+
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="modalContent">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+const TEAM_LOGOS = {
+  'Royal Challengers Bengaluru': '🔴', 'Sunrisers Hyderabad': '🟠', 'Mumbai Indians': '🔵',
+  'Kolkata Knight Riders': '🟣', 'Rajasthan Royals': '🩷', 'Chennai Super Kings': '🟡',
+  'Punjab Kings': '🟤', 'Gujarat Titans': '🩵', 'Lucknow Super Giants': '🩶', 'Delhi Capitals': '💙',
+};
+const TEAM_COLORS = {
+  'Royal Challengers Bengaluru': '#dc2626', 'Sunrisers Hyderabad': '#f97316', 'Mumbai Indians': '#2563eb',
+  'Kolkata Knight Riders': '#7c3aed', 'Rajasthan Royals': '#ec4899', 'Chennai Super Kings': '#ca8a04',
+  'Punjab Kings': '#b45309', 'Gujarat Titans': '#0891b2', 'Lucknow Super Giants': '#64748b', 'Delhi Capitals': '#1d4ed8',
+};
+const SHORT = {
+  'Royal Challengers Bengaluru': 'RCB', 'Sunrisers Hyderabad': 'SRH', 'Mumbai Indians': 'MI',
+  'Kolkata Knight Riders': 'KKR', 'Rajasthan Royals': 'RR', 'Chennai Super Kings': 'CSK',
+  'Punjab Kings': 'PBKS', 'Gujarat Titans': 'GT', 'Lucknow Super Giants': 'LSG', 'Delhi Capitals': 'DC',
+};
+
+let d = null;
+const todayStr = new Date().toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'}).replace(/\//g,' ');
+
+async function loadData() {
+  const res = await fetch('predictions_2026.json');
+  d = await res.json();
+  
+  // Populate filters
+  const teams = Object.keys(d.squads).sort();
+  const tf = document.getElementById('teamFilter');
+  teams.forEach(t => tf.innerHTML += `<option value="${t}">${SHORT[t]} - ${t}</option>`);
+
+  renderStatsBar();
+  renderModelInfo();
+  renderStandings();
+  renderPlayerStats();
+  renderSquads();
+  renderMatches();
+}
+
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('tab-' + tabId).classList.add('active');
+}
+
+function renderStatsBar() {
+  const upc = d.matches.filter(m => !m.is_completed).length;
+  document.getElementById('statsBar').innerHTML = `
+    <div class="stat-card"><div class="stat-value">${d.total_completed}</div><div class="stat-label">Matches Completed</div></div>
+    <div class="stat-card"><div class="stat-value">${upc}</div><div class="stat-label">Matches Remaining</div></div>
+    <div class="stat-card"><div class="stat-value">${d.model_accuracy}%</div><div class="stat-label">Base Model Acc</div></div>
+    <div class="stat-card"><div class="stat-value" style="color:var(--accent2)">${d.correct_on_2026}/${d.total_completed}</div><div class="stat-label">2026 Live Acc</div></div>
+  `;
+}
+
+function renderModelInfo() {
+  document.getElementById('modelInfo').innerHTML = `
+    <div style="margin-bottom:1rem">Engine uses <strong>${d.historical_matches}</strong> historical matches to determine base strength, modulated dynamically by 2026 live form and squad capabilities.</div>
+    <div class="modal-stat-row"><span>Random Forest</span> <span style="color:#4ade80">${d.rf_accuracy}%</span></div>
+    <div class="modal-stat-row"><span>Gradient Boost</span> <span style="color:#4ade80">${d.gb_accuracy}%</span></div>
+    <div class="modal-stat-row"><span>Logistic Reg</span> <span style="color:#4ade80">${d.lr_accuracy}%</span></div>
+  `;
+}
+
+function renderStandings() {
+  // Points Table Tab
+  document.getElementById('pointsTable').querySelector('tbody').innerHTML = d.points_table.map((pt, i) => `
+    <tr>
+      <td class="team-cell">
+        <span style="color:var(--muted);width:20px">${i+1}</span>
+        ${TEAM_LOGOS[pt.team]} ${pt.team}
+      </td>
+      <td>${pt.played}</td><td>${pt.won}</td><td>${pt.lost}</td>
+      <td style="font-weight:700;color:var(--accent2)">${pt.points}</td>
+      <td style="color:${pt.nrr>=0?'#4ade80':'#f87171'}">${pt.nrr>0?'+':''}${pt.nrr}</td>
+    </tr>
+  `).join('');
+
+  // Sidebar Leaderboard (Predicted total wins)
+  // Base wins (from pt) + predicted upcoming wins
+  const projWins = {};
+  d.points_table.forEach(pt => projWins[pt.team] = pt.won);
+  d.matches.filter(m => !m.is_completed).forEach(m => {
+    projWins[m.predicted_winner] = (projWins[m.predicted_winner]||0) + 1;
+  });
+  
+  const sortedProj = Object.entries(projWins).sort((a,b) => b[1]-a[1]);
+  document.getElementById('leaderboard').innerHTML = sortedProj.map(([t, w], i) => `
+    <div class="leaderboard-row">
+      <span class="lb-rank ${i===0?'gold':i===1?'silver':i===2?'bronze':''}">${i+1}</span>
+      <span class="lb-logo">${TEAM_LOGOS[t]}</span>
+      <span class="lb-team">${SHORT[t]}</span>
+      <span class="lb-val">${w} wins</span>
+    </div>
+  `).join('');
+}
+
+function renderPlayerStats() {
+  document.getElementById('battersTable').querySelector('tbody').innerHTML = d.top_batters.map((b, i) => `
+    <tr>
+      <td style="font-weight:600">${i+1}. ${b.name}</td>
+      <td style="font-size:0.8rem;color:var(--muted)">${SHORT[b.team]}</td>
+      <td>${b.matches}</td>
+      <td style="color:#f97316;font-weight:700">${b.runs}</td>
+      <td>${b.sr}</td>
+    </tr>
+  `).join('');
+  
+  document.getElementById('bowlersTable').querySelector('tbody').innerHTML = d.top_bowlers.map((b, i) => `
+    <tr>
+      <td style="font-weight:600">${i+1}. ${b.name} <span style="font-size:0.7rem;color:var(--muted)">(${SHORT[b.team]})</span></td>
+      <td style="color:#a78bfa;font-weight:700">${b.wickets}</td>
+      <td>${b.eco}</td>
+    </tr>
+  `).join('');
+
+  const orange = d.top_batters[0];
+  document.getElementById('orangeCap').innerHTML = `
+    <div class="cap-icon">🧢</div>
+    <div class="cap-details">
+      <div class="cap-name">${orange.name}</div>
+      <div class="cap-team">${orange.team}</div>
+    </div>
+    <div class="cap-stat cap-orange">${orange.runs} <span style="font-size:0.7rem">runs</span></div>
+  `;
+
+  const purple = d.top_bowlers[0];
+  document.getElementById('purpleCap').innerHTML = `
+    <div class="cap-icon" style="filter: hue-rotate(240deg)">🧢</div>
+    <div class="cap-details">
+      <div class="cap-name">${purple.name}</div>
+      <div class="cap-team">${purple.team}</div>
+    </div>
+    <div class="cap-stat cap-purple">${purple.wickets} <span style="font-size:0.7rem">wkts</span></div>
+  `;
+}
+
+function renderSquads() {
+  document.getElementById('squadsContainer').innerHTML = Object.entries(d.squads).map(([team, s]) => `
+    <div class="squad-card">
+      <div class="squad-header">
+        <div class="team-logo" style="width:40px;height:40px;font-size:1.2rem">${TEAM_LOGOS[team]}</div>
+        <h3>${team}</h3>
+      </div>
+      <div class="squad-list">
+        <div><strong>Captain:</strong> ${s.captain}</div>
+        <div style="margin-top:0.5rem"><strong>Key Batters:</strong> ${s.key_batters.join(', ')}</div>
+        <div style="margin-top:0.5rem"><strong>Key Bowlers:</strong> ${s.key_bowlers.join(', ')}</div>
+        ${s.injuries && s.injuries.length ? `<div style="margin-top:0.5rem;color:#ef4444"><strong>🚑 Out/Unavailable:</strong> ${s.injuries.join(', ')}</div>` : ''}
+      </div>
+      <div class="squad-rating">
+        <div class="rating-item"><div class="rating-val">${s.squad_strength}</div><div class="rating-lbl">Ovr</div></div>
+        <div class="rating-item"><div class="rating-val" style="color:#f97316">${s.batting_depth}</div><div class="rating-lbl">Bat</div></div>
+        <div class="rating-item"><div class="rating-val" style="color:#a78bfa">${s.bowling_strength}</div><div class="rating-lbl">Bowl</div></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderMatches() {
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const statusF = document.getElementById('statusFilter').value;
+  const teamF = document.getElementById('teamFilter').value;
+
+  const matches = d.matches.filter(m => {
+    if (search && !m.home_team.toLowerCase().includes(search) &&
+                  !m.away_team.toLowerCase().includes(search) &&
+                  !m.venue.toLowerCase().includes(search)) return false;
+    if (teamF && m.home_team !== teamF && m.away_team !== teamF) return false;
+    if (statusF === 'upcoming' && m.is_completed) return false;
+    if (statusF === 'completed' && !m.is_completed) return false;
+    return true;
+  });
+
+  const byDate = {};
+  matches.forEach(m => { if (!byDate[m.date]) byDate[m.date]=[]; byDate[m.date].push(m); });
+
+  let html = '';
+  Object.entries(byDate).forEach(([date, ms]) => {
+    const isToday = ms[0].date === todayStr;
+    html += `<div class="day-header">
+      <h2>${ms[0].day}, ${date}</h2>
+      ${isToday ? '<span class="day-pill" style="background:var(--accent2);color:black">TODAY</span>' : ''}
+      <div class="day-header-line"></div>
+    </div>`;
+    ms.forEach(m => html += buildMatchCard(m, isToday));
+  });
+  
+  if (!html) html = `<div style="text-align:center;padding:4rem;color:var(--muted)">No matches found matching criteria.</div>`;
+  document.getElementById('matchesContainer').innerHTML = html;
+}
+
+function buildMatchCard(m, isToday) {
+  const isPredHome = m.predicted_winner === m.home_team;
+  const hc = TEAM_COLORS[m.home_team] || '#fff';
+  const ac = TEAM_COLORS[m.away_team] || '#fff';
+
+  let banner = '';
+  if (m.is_completed) {
+    if (m.prediction_correct) banner = `<div class="result-banner result-correct">✅ MATCH COMPLETED: Predicted Correctly! (${m.actual_winner} won)</div>`;
+    else banner = `<div class="result-banner result-incorrect">❌ MATCH COMPLETED: Upset! (${m.actual_winner} won, AI predicted ${m.predicted_winner})</div>`;
+  }
+
+  return `
+  <div class="match-card ${isToday && !m.is_completed ? 'today' : ''}" style="--stripe-color:${m.is_completed?'#334155':(m.confidence>=75?'#22c55e':m.confidence>=60?'#f97316':'#a78bfa')}" onclick="openModal(${m.match_no})">
+    ${banner}
+    <div class="card-top">
+      <div class="team-block home">
+        <div style="display:flex;align-items:center;gap:0.4rem">
+          <div class="team-logo" style="border-color:${hc}50">${TEAM_LOGOS[m.home_team]}</div>
+          ${(m.is_completed ? m.actual_winner : m.predicted_winner) === m.home_team ? '🏆' : ''}
+        </div>
+        <div class="team-name">${m.home_team}</div>
+        <div class="team-role">Home · Form: <span style="color:${m.home_2026_form>=50?'#4ade80':'#f87171'}">${m.home_2026_form}%</span></div>
+      </div>
+      <div class="vs-center">
+        <div class="match-no-badge">Match #${m.match_no}</div>
+        <div class="time-badge">${m.is_completed ? 'Finished' : m.time_utc}</div>
+      </div>
+      <div class="team-block away">
+        <div style="display:flex;align-items:center;gap:0.4rem;flex-direction:row-reverse">
+          <div class="team-logo" style="border-color:${ac}50">${TEAM_LOGOS[m.away_team]}</div>
+          ${(m.is_completed ? m.actual_winner : m.predicted_winner) === m.away_team ? '🏆' : ''}
+        </div>
+        <div class="team-name">${m.away_team}</div>
+        <div class="team-role">Away · Form: <span style="color:${m.away_2026_form>=50?'#4ade80':'#f87171'}">${m.away_2026_form}%</span></div>
+      </div>
+    </div>
+
+    ${!m.is_completed ? `
+    <div class="prob-section">
+      <div class="prob-bar-wrap">
+        <span class="prob-label">${m.home_win_prob}%</span>
+        <div class="prob-bar"><div class="prob-fill-home" style="width:${m.home_win_prob}%;background:${hc}"></div></div>
+        <div class="prob-bar" style="direction:rtl"><div class="prob-fill-away" style="width:${m.away_win_prob}%;background:${ac}"></div></div>
+        <span class="prob-label">${m.away_win_prob}%</span>
+      </div>
+    </div>
+    ` : ''}
+
+    <div class="card-footer">
+      <div class="winner-chip ${m.is_completed ? 'actual' : 'pred'}">
+        ${m.is_completed ? 'Winner: '+m.actual_winner : 'Predicted: '+m.predicted_winner}
+      </div>
+      <div style="text-align:right">
+        ${!m.is_completed ? `<div class="confidence-chip ${m.confidence>=75?'conf-high':m.confidence>=60?'conf-medium':'conf-low'}">AI Conf: ${m.confidence}%</div>` : ''}
+      </div>
+    </div>
+  </div>`;
+}
+
+function openModal(id) {
+  const m = d.matches.find(x => x.match_no === id);
+  document.getElementById('modalBody').innerHTML = `
+    <h3 style="margin-bottom:1.5rem;font-size:1.1rem">${TEAM_LOGOS[m.home_team]} ${SHORT[m.home_team]} vs ${TEAM_LOGOS[m.away_team]} ${SHORT[m.away_team]}</h3>
+    ${m.is_completed ? `<div class="modal-stat-row" style="background:rgba(255,255,255,0.05);padding:1rem;border-radius:0.5rem;margin-bottom:1rem">
+      <span class="modal-stat-key">Actual Winner</span>
+      <span class="modal-stat-val" style="color:var(--accent2)">🏆 ${m.actual_winner}</span>
+    </div>` : ''}
+    <div class="modal-stat-row"><span class="modal-stat-key">Predicted Winner</span><span class="modal-stat-val" style="color:#4ade80">${m.predicted_winner} (${m.confidence}%)</span></div>
+    <div class="modal-stat-row"><span class="modal-stat-key">Match Date/Venue</span><span class="modal-stat-val">${m.date} · ${m.venue}</span></div>
+    <br/>
+    <div class="modal-stat-row" style="color:var(--accent2);border:none;padding-bottom:0"><strong>2026 Live Form Comparison</strong></div>
+    <div class="modal-stat-row"><span class="modal-stat-key">2026 Wins / Played</span><span class="modal-stat-val">${m.home_2026_wins}/${m.home_2026_played} vs ${m.away_2026_wins}/${m.away_2026_played}</span></div>
+    <div class="modal-stat-row"><span class="modal-stat-key">Current Momentum</span><span class="modal-stat-val">${m.home_momentum}% vs ${m.away_momentum}%</span></div>
+    <div class="modal-stat-row"><span class="modal-stat-key">Net Run Rate (NRR)</span><span class="modal-stat-val">${m.home_nrr} vs ${m.away_nrr}</span></div>
+    <br/>
+    <div class="modal-stat-row" style="color:#a78bfa;border:none;padding-bottom:0"><strong>Historical & Squad Base</strong></div>
+    <div class="modal-stat-row"><span class="modal-stat-key">Head to Head Wins</span><span class="modal-stat-val">${m.h2h_home_wr}% Home vs ${Math.round(100 - m.h2h_home_wr)}% Away</span></div>
+    <div class="modal-stat-row"><span class="modal-stat-key">Squad Strength Rating</span><span class="modal-stat-val">${m.home_squad_str} vs ${m.away_squad_str}</span></div>
+    <div class="modal-stat-row"><span class="modal-stat-key">Captains</span><span class="modal-stat-val">${m.home_captain} vs ${m.away_captain}</span></div>
+  `;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function closeModal(e) {
+  if (!e || e.target.id === 'modalOverlay') document.getElementById('modalOverlay').classList.remove('open');
+}
+
+window.addEventListener('scroll', () => {
+  document.getElementById('scrollTop').classList.toggle('visible', window.scrollY > 300);
+});
+
+loadData();
+</script>
+</body>
+</html>
