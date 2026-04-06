@@ -1,0 +1,11 @@
+# Keep deployment slim by ignoring large ML data files
+IPL.csv
+ipl_prediction.log
+__pycache__/
+.pytest_cache/
+tests/
+notebooks/
+.DS_Store
+data/processed/
+data/db/
+outputs/models/
