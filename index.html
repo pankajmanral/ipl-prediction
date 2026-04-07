@@ -350,7 +350,7 @@
 
     .layout {
       display: grid;
-      grid-template-columns: 1fr 320px;
+      grid-template-columns: 1fr;
       gap: 2rem;
       align-items: start;
     }
@@ -641,6 +641,16 @@
       border-bottom: 1px solid var(--border);
       font-size: 0.9rem;
     }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.2); opacity: 0.7; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .live-pulse {
+      animation: pulse 1.5s infinite;
+    }
   </style>
 </head>
 
@@ -670,6 +680,9 @@
 
     <!-- PREDICTIONS TAB -->
     <div id="tab-predictions" class="tab-content active">
+      <!-- Live Score Section -->
+      <div id="liveMatchSection" style="margin-bottom: 2rem;"></div>
+      
       <!-- Featured Today Match -->
       <div id="todaySection"></div>
 
@@ -775,6 +788,7 @@
     };
 
     let d = null;
+    let live = {};
     let activeTab = 'predictions';
 
     async function init() {
@@ -784,6 +798,9 @@
       try {
         const res = await fetch('predictions_2026.json?nocache=' + Date.now());
         d = await res.json();
+
+        const lres = await fetch('live_scores_2026.json?nocache=' + Date.now());
+        live = await lres.json();
 
         renderAll();
       } catch (e) { console.error("Sync failed", e); }
@@ -796,6 +813,7 @@
       renderStandings();
       renderPlayerStats();
       renderSquads();
+      renderLiveMatches();
       renderMatches(); // This will auto-update Today's card if time changed
     }
 
@@ -808,6 +826,98 @@
 
     // Auto-refresh every 15 seconds
     setInterval(init, 15000);
+
+    function renderLiveMatches() {
+      const cont = document.getElementById('liveMatchSection');
+      if (!cont) return;
+
+      const liveMatches = Object.values(live);
+
+      if (liveMatches.length === 0) {
+        cont.innerHTML = `
+          <div style="background:var(--surface); border:1px dashed var(--border); border-radius:1rem; padding:1.5rem; text-align:center; color:var(--muted); font-size:0.85rem">
+            No live match currently
+          </div>
+        `;
+        return;
+      }
+
+      cont.innerHTML = `
+        <h2 style="font-size:0.75rem; color:#ef4444; margin-bottom:1rem; display:flex; align-items:center; gap:0.5rem">
+          <span class="live-pulse" style="width:10px;height:10px;background:#ef4444;border-radius:50%;box-shadow:0 0 10px #ef4444"></span> REAL-TIME LIVE SCORE (RAPIDAPI)
+        </h2>
+        ${liveMatches.map(m => buildLiveCard(m)).join('')}
+      `;
+    }
+
+    function buildLiveCard(m) {
+      const hc = TEAM_COLORS[m.team1] || TEAM_COLORS[cleanTeamName(m.team1)] || '#94a3b8';
+      const ac = TEAM_COLORS[m.team2] || TEAM_COLORS[cleanTeamName(m.team2)] || '#94a3b8';
+      
+      const lastOversHtml = m.last_overs && m.last_overs.length > 0 ? `
+        <div style="display:flex; gap:0.25rem; margin-top:0.75rem">
+          ${m.last_overs.map(ball => `
+            <span style="width:20px;height:20px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:0.6rem;border-radius:50%;color:${ball === 'W' ? '#ef4444' : ball === '6' ? '#4ade80' : ball === '4' ? '#facc15' : 'inherit'}">${ball}</span>
+          `).join('')}
+        </div>
+      ` : '';
+
+      const statsHtml = m.batsmen && m.batsmen.length > 0 ? `
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); font-size:0.75rem">
+          <div>
+            ${m.batsmen.map(b => `<div style="display:flex;justify-content:space-between"><span>${b.name}${b.name !== 'Batter 1' ? '*' : ''}</span> <strong>${b.runs}(${b.balls})</strong></div>`).join('')}
+          </div>
+          <div style="border-left: 1px solid var(--border); padding-left:1rem">
+            <div style="display:flex;justify-content:space-between;color:var(--muted)">Bowler: <span>${m.bowler?.name || 'N/A'}</span></div>
+            <div style="display:flex;justify-content:space-between"><span>${m.bowler?.overs || '0.0'} - ${m.bowler?.runs || '0'} - ${m.bowler?.wickets || '0'}</span></div>
+          </div>
+        </div>
+      ` : '';
+
+      return `
+        <div class="match-card" style="--stripe-color:#ef4444; background: linear-gradient(135deg, var(--surface) 0%, #1e1b4b 100%)">
+          <div style="padding: 1.5rem">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 1rem">
+              <div style="display:flex; flex-direction:column; gap:0.5rem">
+                <div style="font-size:1.1rem; font-weight:800; color:white">${m.team1 || 'Team A'} vs ${m.team2 || 'Team B'}</div>
+                <div style="font-size:0.75rem; color: #4ade80; font-weight: 700">${m.status}</div>
+              </div>
+              <div style="text-align:right">
+                <div style="font-size:0.65rem; color:var(--muted); text-transform:uppercase">${m.title || 'Live Match'}</div>
+              </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns: 1fr auto 1fr; align-items:center; gap:2rem; margin-top:1.5rem">
+              <div style="text-align:center">
+                <div style="font-size:1.8rem; font-weight:900; color:white">${m.team1_score}</div>
+                <div style="font-size:0.7rem; font-weight:700; color:${hc}">${m.team1}</div>
+              </div>
+              <div style="background:var(--border); width:1px; height:40px"></div>
+              <div style="text-align:center">
+                <div style="font-size:1.8rem; font-weight:900; color:white">${m.team2_score}</div>
+                <div style="font-size:0.7rem; font-weight:700; color:${ac}">${m.team2}</div>
+              </div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; margin-top:1.5rem; font-size:0.75rem; font-weight:700">
+               <div>CRR: <span style="color:white">${m.crr}</span></div>
+               <div>RRR: <span style="color:white">${m.rrr === 'N/A' ? '-' : m.rrr}</span></div>
+            </div>
+
+            ${statsHtml}
+            ${lastOversHtml}
+          </div>
+        </div>
+      `;
+    }
+
+    function cleanTeamName(name) {
+      if (!name) return "";
+      for (let team in TEAM_COLORS) {
+        if (name.includes(team) || team.includes(name)) return team;
+      }
+      return name;
+    }
 
     function renderStatsBar() {
       const rem = d.matches.filter(m => !m.is_completed).length;

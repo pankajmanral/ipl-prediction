@@ -10,6 +10,7 @@ Incorporates:
 import pandas as pd
 import numpy as np
 import json
+import os
 import warnings
 from datetime import datetime
 warnings.filterwarnings('ignore')
@@ -118,103 +119,103 @@ INJURIES_2026 = {
 SQUAD_2026 = {
     'Royal Challengers Bengaluru': {
         'captain': 'Rajat Patidar',
-        'key_batters': ['Virat Kohli', 'Devdutt Padikkal', 'Tim David', 'Rajat Patidar', 'Phil Salt'],
-        'key_bowlers': ['Bhuvneshwar Kumar', 'Josh Hazlewood', 'Jacob Duffy', 'Krunal Pandya'],
-        'star_players': ['Virat Kohli', 'Tim David', 'Jacob Duffy', 'Bhuvneshwar Kumar'],
-        'injuries': ['Josh Hazlewood (unavailable early)'],
-        'batting_depth': 8.5,
-        'bowling_strength': 8.0,
+        'key_batters': ['Virat Kohli', 'Rajat Patidar', 'Devdutt Padikkal', 'Jacob Bethell', 'Phil Salt'],
+        'key_bowlers': ['Mohammed Siraj', 'Yash Dayal', 'Krunal Pandya', 'Jacob Duffy', 'Nuwan Thushara'],
+        'star_players': ['Virat Kohli', 'Mohammed Siraj', 'Krunal Pandya', 'Rajat Patidar'],
+        'injuries': ['Josh Hazlewood (Achilles - OUT)'],
+        'batting_depth': 8.6,
+        'bowling_strength': 8.3,
         'squad_strength': 8.5,
     },
     'Sunrisers Hyderabad': {
-        'captain': 'Ishan Kishan',
-        'key_batters': ['Travis Head', 'Heinrich Klaasen', 'Abhishek Sharma', 'Ishan Kishan'],
-        'key_bowlers': ['David Payne', 'Mohammed Shami', 'Nitish Kumar Reddy', 'Jaydev Unadkat'],
-        'star_players': ['Travis Head', 'Heinrich Klaasen', 'Ishan Kishan'],
-        'injuries': ['Pat Cummins (back)', 'Jack Edwards (foot)'],
-        'batting_depth': 8.0,
-        'bowling_strength': 7.1,
-        'squad_strength': 7.5,
+        'captain': 'Pat Cummins',
+        'key_batters': ['Heinrich Klaasen', 'Abhishek Sharma', 'Ishan Kishan', 'Travis Head', 'Liam Livingstone'],
+        'key_bowlers': ['Pat Cummins', 'Harshal Patel', 'Jaydev Unadkat', 'Brydon Carse', 'Nitish Kumar Reddy'],
+        'star_players': ['Heinrich Klaasen', 'Abhishek Sharma', 'Ishan Kishan', 'Pat Cummins'],
+        'injuries': ['None'],
+        'batting_depth': 9.4,
+        'bowling_strength': 8.7,
+        'squad_strength': 9.1,
     },
     'Mumbai Indians': {
         'captain': 'Hardik Pandya',
-        'key_batters': ['Rohit Sharma', 'Suryakumar Yadav', 'Hardik Pandya', 'Tilak Varma'],
-        'key_bowlers': ['Jasprit Bumrah', 'Trent Boult', 'Hardik Pandya', 'Deepak Chahar'],
-        'star_players': ['Rohit Sharma', 'Suryakumar Yadav', 'Jasprit Bumrah', 'Trent Boult'],
+        'key_batters': ['Rohit Sharma', 'Suryakumar Yadav', 'Tilak Varma', 'Quinton de Kock', 'Hardik Pandya'],
+        'key_bowlers': ['Jasprit Bumrah', 'Trent Boult', 'Deepak Chahar', 'Mayank Markande', 'Will Jacks'],
+        'star_players': ['Rohit Sharma', 'Suryakumar Yadav', 'Jasprit Bumrah', 'Hardik Pandya', 'Quinton de Kock'],
         'injuries': ['Atharva Ankolekar (knee)'],
-        'batting_depth': 8.5,
-        'bowling_strength': 9.0,
-        'squad_strength': 8.8,
+        'batting_depth': 9.2,
+        'bowling_strength': 9.3,
+        'squad_strength': 9.2,
     },
     'Kolkata Knight Riders': {
         'captain': 'Ajinkya Rahane',
-        'key_batters': ['Sunil Narine', 'Rinku Singh', 'Cameron Green', 'Angkrish Raghuvanshi'],
-        'key_bowlers': ['Varun Chakaravarthy', 'Saurabh Dubey', 'Andre Russell', 'Mitchell Starc'],
-        'star_players': ['Sunil Narine', 'Varun Chakaravarthy', 'Cameron Green'],
-        'injuries': ['Harshit Rana (knee)', 'Akash Deep (back)', 'Matheesha Pathirana (shoulder)', 'Mustafizur Rahman (unavailable)'],
-        'batting_depth': 7.5,
-        'bowling_strength': 7.3,
-        'squad_strength': 7.4,
+        'key_batters': ['Rinku Singh', 'Andre Russell', 'Cameron Green', 'Manish Pandey', 'Ajinkya Rahane'],
+        'key_bowlers': ['Matheesha Pathirana', 'Varun Chakaravarthy', 'Washington Sundar', 'Umran Malik', 'Saurabh Dubey'],
+        'star_players': ['Andre Russell', 'Cameron Green', 'Rinku Singh', 'Matheesha Pathirana'],
+        'injuries': ['Harshit Rana (knee)'],
+        'batting_depth': 8.8,
+        'bowling_strength': 8.5,
+        'squad_strength': 8.7,
     },
     'Rajasthan Royals': {
-        'captain': 'Sanju Samson',
-        'key_batters': ['Yashasvi Jaiswal', 'Sanju Samson', 'Dhruv Jurel', 'Shimron Hetmyer'],
-        'key_bowlers': ['Ravi Bishnoi', 'Jofra Archer', 'Yuzvendra Chahal', 'Nandre Burger'],
-        'star_players': ['Yashasvi Jaiswal', 'Ravi Bishnoi', 'Jofra Archer', 'Ravindra Jadeja'],
-        'injuries': ['Sam Curran (groin)'],
-        'batting_depth': 8.0,
-        'bowling_strength': 8.5,
-        'squad_strength': 8.2,
+        'captain': 'Riyan Parag',
+        'key_batters': ['Yashasvi Jaiswal', 'Shimron Hetmyer', 'Riyan Parag', 'Vaibhav Sooryavanshi', 'Dhruv Jurel'],
+        'key_bowlers': ['Ravindra Jadeja', 'Jofra Archer', 'Ravi Bishnoi', 'Sandeep Sharma', 'Nandre Burger'],
+        'star_players': ['Yashasvi Jaiswal', 'Ravindra Jadeja', 'Jofra Archer', 'Riyan Parag'],
+        'injuries': ['None'],
+        'batting_depth': 8.9,
+        'bowling_strength': 9.1,
+        'squad_strength': 9.0,
     },
     'Chennai Super Kings': {
         'captain': 'Ruturaj Gaikwad',
-        'key_batters': ['Ruturaj Gaikwad', 'Ayush Mhatre', 'MS Dhoni', 'Sarfaraz Khan'],
-        'key_bowlers': ['Ravindra Jadeja', 'Anshul Kamboj', 'Spencer Johnson', 'Noor Ahmad'],
-        'star_players': ['Ruturaj Gaikwad', 'Ravindra Jadeja'],
-        'injuries': ['MS Dhoni (calf)', 'Nathan Ellis (hamstring)'],
-        'batting_depth': 7.2,
-        'bowling_strength': 7.0,
-        'squad_strength': 7.1,
+        'key_batters': ['Ruturaj Gaikwad', 'MS Dhoni', 'Sanju Samson', 'Shivam Dube', 'Matthew Short'],
+        'key_bowlers': ['Noor Ahmad', 'Khaleel Ahmed', 'Spencer Johnson', 'Rahul Chahar', 'Matt Henry'],
+        'star_players': ['Ruturaj Gaikwad', 'MS Dhoni', 'Sanju Samson', 'Shivam Dube'],
+        'injuries': ['MS Dhoni (calf - playing)', 'Nathan Ellis (hamstring)'],
+        'batting_depth': 9.3,
+        'bowling_strength': 8.2,
+        'squad_strength': 8.8,
     },
     'Punjab Kings': {
         'captain': 'Shreyas Iyer',
-        'key_batters': ['Shreyas Iyer', 'Priyansh Arya', 'Cooper Connolly', 'Shashank Singh'],
-        'key_bowlers': ['Arshdeep Singh', 'Vijaykumar Vyshak', 'Marcus Stoinis', 'Yuvraj Singh'],
-        'star_players': ['Shreyas Iyer', 'Arshdeep Singh', 'Cooper Connolly', 'Vijaykumar Vyshak'],
+        'key_batters': ['Shreyas Iyer', 'Phil Salt', 'Sunil Narine', 'Nehal Wadhera', 'Priyansh Arya'],
+        'key_bowlers': ['Arshdeep Singh', 'Anrich Nortje', 'Yuzvendra Chahal', 'Vijaykumar Vyshak', 'Xavier Bartlett'],
+        'star_players': ['Shreyas Iyer', 'Sunil Narine', 'Phil Salt', 'Arshdeep Singh'],
         'injuries': ['Lockie Ferguson (personal)'],
-        'batting_depth': 7.8,
-        'bowling_strength': 7.9,
-        'squad_strength': 7.9,
+        'batting_depth': 8.7,
+        'bowling_strength': 8.9,
+        'squad_strength': 8.8,
     },
     'Gujarat Titans': {
         'captain': 'Shubman Gill',
-        'key_batters': ['Shubman Gill', 'Jos Buttler', 'Sai Sudharsan', 'Washington Sundar'],
-        'key_bowlers': ['Rashid Khan', 'Kagiso Rabada', 'Mohammed Siraj', 'Prasidh Krishna'],
-        'star_players': ['Shubman Gill', 'Rashid Khan', 'Jos Buttler', 'Kagiso Rabada'],
-        'injuries': ['Prithviraj Yarra (unavailable)'],
-        'batting_depth': 8.0,
-        'bowling_strength': 8.5,
-        'squad_strength': 8.0,
+        'key_batters': ['Shubman Gill', 'Sai Sudharsan', 'Shahrukh Khan', 'Kane Williamson', 'Jos Buttler'],
+        'key_bowlers': ['Rashid Khan', 'Mohammed Shami', 'Kagiso Rabada', 'Mohammed Siraj', 'Nishant Sindhu'],
+        'star_players': ['Shubman Gill', 'Rashid Khan', 'Mohammed Shami', 'Jos Buttler'],
+        'injuries': ['None'],
+        'batting_depth': 9.0,
+        'bowling_strength': 9.4,
+        'squad_strength': 9.2,
     },
     'Lucknow Super Giants': {
         'captain': 'Rishabh Pant',
-        'key_batters': ['Rishabh Pant', 'Mitchell Marsh', 'Abdul Samad', 'Nicholas Pooran'],
-        'key_bowlers': ['Mohammed Shami', 'T Natarajan', 'Ravi Bishnoi', 'Avesh Khan'],
-        'star_players': ['Rishabh Pant', 'Mohammed Shami', 'Mitchell Marsh'],
-        'injuries': ['Wanindu Hasaranga (hamstring)', 'Josh Inglis (personal)'],
-        'batting_depth': 7.6,
-        'bowling_strength': 7.7,
-        'squad_strength': 7.6,
+        'key_batters': ['Rishabh Pant', 'Glenn Maxwell', 'Marcus Stoinis', 'Nicholas Pooran', 'Ayush Badoni'],
+        'key_bowlers': ['Mayank Yadav', 'Ravi Bishnoi', 'Avesh Khan', 'Mohsin Khan', 'Arshin Kulkarni'],
+        'star_players': ['Rishabh Pant', 'Glenn Maxwell', 'Marcus Stoinis', 'Ravi Bishnoi'],
+        'injuries': ['Wanindu Hasaranga (hamstring)'],
+        'batting_depth': 9.5,
+        'bowling_strength': 8.4,
+        'squad_strength': 9.0,
     },
     'Delhi Capitals': {
         'captain': 'Axar Patel',
-        'key_batters': ['KL Rahul', 'Sameer Rizvi', 'Tristan Stubbs', 'Faf du Plessis'],
-        'key_bowlers': ['Khaleel Ahmed', 'Kuldeep Yadav', 'Axar Patel', 'Lungi Ngidi'],
-        'star_players': ['KL Rahul', 'Sameer Rizvi', 'Kuldeep Yadav'],
+        'key_batters': ['KL Rahul', 'Tristan Stubbs', 'David Miller', 'Nitish Rana', 'Sameer Rizvi'],
+        'key_bowlers': ['Kuldeep Yadav', 'T Natarajan', 'Mitchell Starc', 'Lungi Ngidi', 'Mukesh Kumar'],
+        'star_players': ['KL Rahul', 'Kuldeep Yadav', 'Axar Patel', 'Mitchell Starc'],
         'injuries': ['Mitchell Starc (workload mgmt)'],
-        'batting_depth': 8.0,
-        'bowling_strength': 8.1,
-        'squad_strength': 8.0,
+        'batting_depth': 8.8,
+        'bowling_strength': 9.0,
+        'squad_strength': 8.9,
     },
 }
 
@@ -235,88 +236,6 @@ TOP_BOWLERS_2026 = {
     'Jasprit Bumrah':      {'team': 'Mumbai Indians',              'wickets': 4, 'matches': 2, 'eco': 6.2},
 }
 
-SQUAD_2026 = {
-    'Royal Challengers Bengaluru': {
-        'captain': 'Rajat Patidar',
-        'key_batters': ['Virat Kohli', 'Devdutt Padikkal', 'Tim David', 'Rajat Patidar', 'Phil Salt'],
-        'key_bowlers': ['Bhuvneshwar Kumar', 'Josh Hazlewood', 'Jacob Duffy', 'Krunal Pandya'],
-        'star_players': ['Virat Kohli', 'Tim David', 'Jacob Duffy', 'Bhuvneshwar Kumar'],
-        'injuries': ['Josh Hazlewood (Achilles)'],
-        'batting_depth': 8.5, 'bowling_strength': 8.0, 'squad_strength': 8.5,
-    },
-    'Sunrisers Hyderabad': {
-        'captain': 'Ishan Kishan',
-        'key_batters': ['Travis Head', 'Heinrich Klaasen', 'Abhishek Sharma', 'Ishan Kishan'],
-        'key_bowlers': ['David Payne', 'Mohammed Shami', 'Nitish Kumar Reddy', 'Jaydev Unadkat'],
-        'star_players': ['Travis Head', 'Heinrich Klaasen', 'Ishan Kishan'],
-        'injuries': ['Pat Cummins (back)', 'Jack Edwards (foot)'],
-        'batting_depth': 8.0, 'bowling_strength': 7.1, 'squad_strength': 7.5,
-    },
-    'Mumbai Indians': {
-        'captain': 'Hardik Pandya',
-        'key_batters': ['Rohit Sharma', 'Suryakumar Yadav', 'Hardik Pandya', 'Tilak Varma'],
-        'key_bowlers': ['Jasprit Bumrah', 'Trent Boult', 'Hardik Pandya', 'Deepak Chahar'],
-        'star_players': ['Rohit Sharma', 'Suryakumar Yadav', 'Jasprit Bumrah', 'Trent Boult'],
-        'injuries': ['Atharva Ankolekar (knee)'],
-        'batting_depth': 8.5, 'bowling_strength': 9.0, 'squad_strength': 8.8,
-    },
-    'Kolkata Knight Riders': {
-        'captain': 'Ajinkya Rahane',
-        'key_batters': ['Sunil Narine', 'Rinku Singh', 'Cameron Green', 'Angkrish Raghuvanshi'],
-        'key_bowlers': ['Varun Chakaravarthy', 'Saurabh Dubey', 'Andre Russell', 'Mitchell Starc'],
-        'star_players': ['Sunil Narine', 'Varun Chakaravarthy', 'Cameron Green'],
-        'injuries': ['Harshit Rana (knee)', 'Akash Deep (back)', 'Matheesha Pathirana (shoulder)'],
-        'batting_depth': 7.5, 'bowling_strength': 7.3, 'squad_strength': 7.4,
-    },
-    'Rajasthan Royals': {
-        'captain': 'Sanju Samson',
-        'key_batters': ['Yashasvi Jaiswal', 'Sanju Samson', 'Dhruv Jurel', 'Shimron Hetmyer'],
-        'key_bowlers': ['Ravi Bishnoi', 'Jofra Archer', 'Yuzvendra Chahal', 'Nandre Burger'],
-        'star_players': ['Yashasvi Jaiswal', 'Ravi Bishnoi', 'Jofra Archer', 'Ravindra Jadeja'],
-        'injuries': ['Sam Curran (groin)'],
-        'batting_depth': 8.0, 'bowling_strength': 8.5, 'squad_strength': 8.2,
-    },
-    'Chennai Super Kings': {
-        'captain': 'Ruturaj Gaikwad',
-        'key_batters': ['Ruturaj Gaikwad', 'Ayush Mhatre', 'MS Dhoni', 'Sarfaraz Khan'],
-        'key_bowlers': ['Ravindra Jadeja', 'Anshul Kamboj', 'Spencer Johnson', 'Noor Ahmad'],
-        'star_players': ['Ruturaj Gaikwad', 'Ravindra Jadeja'],
-        'injuries': ['MS Dhoni (calf)', 'Nathan Ellis (hamstring)'],
-        'batting_depth': 7.2, 'bowling_strength': 7.0, 'squad_strength': 7.1,
-    },
-    'Punjab Kings': {
-        'captain': 'Shreyas Iyer',
-        'key_batters': ['Shreyas Iyer', 'Priyansh Arya', 'Cooper Connolly', 'Shashank Singh'],
-        'key_bowlers': ['Arshdeep Singh', 'Vijaykumar Vyshak', 'Marcus Stoinis', 'Yuvraj Singh'],
-        'star_players': ['Shreyas Iyer', 'Arshdeep Singh', 'Cooper Connolly', 'Vijaykumar Vyshak'],
-        'injuries': ['Lockie Ferguson (personal)'],
-        'batting_depth': 7.8, 'bowling_strength': 7.9, 'squad_strength': 7.9,
-    },
-    'Gujarat Titans': {
-        'captain': 'Shubman Gill',
-        'key_batters': ['Shubman Gill', 'Jos Buttler', 'Sai Sudharsan', 'Washington Sundar'],
-        'key_bowlers': ['Rashid Khan', 'Kagiso Rabada', 'Mohammed Siraj', 'Prasidh Krishna'],
-        'star_players': ['Shubman Gill', 'Rashid Khan', 'Jos Buttler', 'Kagiso Rabada'],
-        'injuries': ['Prithviraj Yarra (unavailable)'],
-        'batting_depth': 8.0, 'bowling_strength': 8.5, 'squad_strength': 8.0,
-    },
-    'Lucknow Super Giants': {
-        'captain': 'Rishabh Pant',
-        'key_batters': ['Rishabh Pant', 'Mitchell Marsh', 'Abdul Samad', 'Nicholas Pooran'],
-        'key_bowlers': ['Mohammed Shami', 'T Natarajan', 'Ravi Bishnoi', 'Avesh Khan'],
-        'star_players': ['Rishabh Pant', 'Mohammed Shami', 'Mitchell Marsh'],
-        'injuries': ['Wanindu Hasaranga (hamstring)', 'Josh Inglis (personal)'],
-        'batting_depth': 7.6, 'bowling_strength': 7.7, 'squad_strength': 7.6,
-    },
-    'Delhi Capitals': {
-        'captain': 'Axar Patel',
-        'key_batters': ['KL Rahul', 'Sameer Rizvi', 'Tristan Stubbs', 'Faf du Plessis'],
-        'key_bowlers': ['Khaleel Ahmed', 'Kuldeep Yadav', 'Axar Patel', 'Lungi Ngidi'],
-        'star_players': ['KL Rahul', 'Sameer Rizvi', 'Kuldeep Yadav'],
-        'injuries': ['Mitchell Starc (workload mgmt)'],
-        'batting_depth': 8.0, 'bowling_strength': 8.1, 'squad_strength': 8.0,
-    },
-}
 
 # ─── HISTORICAL DATA ─────────────────────────────────────────────────────────
 print("Loading IPL historical data (2008–2025)...")
@@ -571,6 +490,14 @@ schedule['Date'] = pd.to_datetime(schedule['Date'], format='%d/%m/%Y %H:%M')
 completed_nos = {m[0] for m in COMPLETED_2026}
 completed_lookup = {m[0]: m for m in COMPLETED_2026}
 
+# Load Live Scores dynamically
+live_scores_map = {}
+if os.path.exists('live_scores_2026.json'):
+    try:
+        with open('live_scores_2026.json', 'r') as f:
+            live_scores_map = json.load(f)
+    except: pass
+
 results = []
 for _, row in schedule.iterrows():
     home  = str(row['Home Team']).strip()
@@ -606,8 +533,8 @@ for _, row in schedule.iterrows():
     today_str = datetime.now().strftime('%d %b %Y') # e.g. "07 Apr 2026"
     is_today = date.strftime('%d %b %Y') == today_str
 
-    # Removing live score logic (Scrapped as requested)
-    live_score = None
+    # Live score from map if available
+    live_score = live_scores_map.get(str(mno))
 
     results.append({
         'match_no':         mno,
