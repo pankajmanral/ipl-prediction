@@ -425,10 +425,24 @@ hist_form   = {t: recent_form(valid_sorted, t, 20) for t in TEAMS_2026}
 
 # 2026 live form & squad strength adjustments
 def get_effective_form(team):
-    """Blend historical form (40%) + 2026 live form (60%)"""
+    """
+    Dynamic Intelligence:
+    Blend historical form (2008-2025) with 2026 live performance.
+    Weight moves from 70% history / 30% live (start of season)
+    to 30% history / 70% live (end of season).
+    """
     hist = hist_form.get(team, 0.5)
     live = FORM_2026.get(team, 0.5)
-    return 0.4 * hist + 0.6 * live
+    
+    # Progress Calculation (IPL 2026 has 70 matches in group stage)
+    matches_played = POINTS_TABLE_2026.get(team, [0])[0]
+    season_progress = min(1.0, matches_played / 14.0) # Assume 14 group matches per team
+    
+    # Weight 2026 form significantly more as requested (Priority #1)
+    live_weight = 0.5 + (0.3 * season_progress) # Range: 0.5 to 0.8
+    hist_weight = 1.0 - live_weight
+    
+    return (hist_weight * hist) + (live_weight * live)
 
 def get_squad_strength(team):
     """Normalised squad strength from 2026 squad data"""
@@ -515,17 +529,33 @@ def predict_match(home_team, away_team, venue):
     p_lr = lr.predict_proba(feats)[0][1]
     p_team1 = (p_rf*rf_acc + p_gb*gb_acc + p_lr*lr_acc) / total_acc
     
+    # Apply Star Player form (from TOP_BATTERS_2026)
+    h_stars = sum(1 for p, s in TOP_BATTERS_2026.items() if s['team'] == home_team and s['runs'] > 100)
+    a_stars = sum(1 for p, s in TOP_BATTERS_2026.items() if s['team'] == away_team and s['runs'] > 100)
+    star_boost = (h_stars - a_stars) * 0.02
+    
+    # Apply Head-to-Head (H2H) Bias
+    h2h_rate, h2h_n = compute_h2h(valid_sorted, home_team, away_team)
+    h2h_bias = 0
+    if h2h_n > 5:
+        h2h_bias = (h2h_rate - 0.5) * 0.1 # Max +/- 5% bias from historical dominance
+    
     # Apply Venue Bias (Home teams get +8% boost in their cities)
     venue_boost = 0
     home_short = SHORT_NAMES.get(home_team, "")
     if home_short and home_short.lower() in venue.lower():
         venue_boost = 0.08
     
-    # Apply Injury Penalty (e.g. MS Dhoni missing for CSK)
+    # Apply Injury Penalty
     h_pen = len(INJURIES_2026.get(home_team, [])) * 0.05
     a_pen = len(INJURIES_2026.get(away_team, [])) * 0.05
     
-    p_final = p_team1 + venue_boost - h_pen + a_pen
+    # --- FORM PRIORITY OVERRIDE (User-Requested Priority #1) ---
+    h_f = get_effective_form(home_team)
+    a_f = get_effective_form(away_team)
+    form_bias = (h_f - a_f) * 0.7 # Powerful 70% bias toward the in-form team
+    
+    p_final = p_team1 + venue_boost + star_boost + h2h_bias + form_bias - h_pen + a_pen
     p_final = max(0.01, min(0.99, p_final))
 
     winner   = home_team if p_final >= 0.5 else away_team
