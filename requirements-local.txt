@@ -9,3 +9,5 @@ joblib>=1.4
 shap>=0.47
 optuna>=3.6
 Flask>=3.0
+requests>=2.32
+beautifulsoup4>=4.12

@@ -1,0 +1,14 @@
+[
+  {"match_no": 1, "home": "Royal Challengers Bengaluru", "away": "Sunrisers Hyderabad", "winner": "Royal Challengers Bengaluru", "home_score": "203/4", "away_score": "201/9", "margin": "6 wkts"},
+  {"match_no": 2, "home": "Mumbai Indians", "away": "Kolkata Knight Riders", "winner": "Mumbai Indians", "home_score": "224/4", "away_score": "220/4", "margin": "6 wkts"},
+  {"match_no": 3, "home": "Rajasthan Royals", "away": "Chennai Super Kings", "winner": "Rajasthan Royals", "home_score": "128/2", "away_score": "127", "margin": "8 wkts"},
+  {"match_no": 4, "home": "Punjab Kings", "away": "Gujarat Titans", "winner": "Punjab Kings", "home_score": "165/7", "away_score": "162/6", "margin": "3 wkts"},
+  {"match_no": 5, "home": "Lucknow Super Giants", "away": "Delhi Capitals", "winner": "Delhi Capitals", "home_score": "141", "away_score": "145/4", "margin": "6 wkts"},
+  {"match_no": 6, "home": "Kolkata Knight Riders", "away": "Sunrisers Hyderabad", "winner": "Sunrisers Hyderabad", "home_score": "161", "away_score": "226/8", "margin": "65 runs"},
+  {"match_no": 7, "home": "Chennai Super Kings", "away": "Punjab Kings", "winner": "Punjab Kings", "home_score": "208/5", "away_score": "209/5", "margin": "5 wkts"},
+  {"match_no": 8, "home": "Delhi Capitals", "away": "Mumbai Indians", "winner": "Delhi Capitals", "home_score": "162/6", "away_score": "165/4", "margin": "6 wkts"},
+  {"match_no": 9, "home": "Rajasthan Royals", "away": "Gujarat Titans", "winner": "Rajasthan Royals", "home_score": "210/6", "away_score": "204/8", "margin": "6 runs"},
+  {"match_no": 10, "home": "Sunrisers Hyderabad", "away": "Lucknow Super Giants", "winner": "Lucknow Super Giants", "home_score": "156/9", "away_score": "160/5", "margin": "5 wkts"},
+  {"match_no": 11, "home": "Royal Challengers Bengaluru", "away": "Chennai Super Kings", "winner": "Royal Challengers Bengaluru", "home_score": "250/3", "away_score": "207", "margin": "43 runs"},
+  {"match_no": 12, "home": "Kolkata Knight Riders", "away": "Punjab Kings", "winner": "None", "home_score": "25/2", "away_score": "DNB", "margin": "No result (due to rain)"}
+]
