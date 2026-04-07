@@ -910,8 +910,12 @@
 
       let banner = '';
       if (m.is_completed) {
-        const isOk = m.actual_winner === m.predicted_winner;
-        banner = `<div class="res-banner ${isOk ? 'res-ok' : 'res-err'}">${isOk ? '✅ PREDICTION CORRECT' : '❌ UPSET DETECTED'} — ${m.actual_winner} won</div>`;
+        if (m.actual_winner === 'None') {
+          banner = `<div class="res-banner" style="color:var(--muted)">⚪ MATCH ABANDONED — No Result</div>`;
+        } else {
+          const isOk = m.actual_winner === m.predicted_winner;
+          banner = `<div class="res-banner ${isOk ? 'res-ok' : 'res-err'}">${isOk ? '✅ PREDICTION CORRECT' : '❌ UPSET DETECTED'} — ${m.actual_winner} won</div>`;
+        }
       }
 
       return `
