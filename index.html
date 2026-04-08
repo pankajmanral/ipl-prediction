@@ -1003,11 +1003,10 @@
     function renderMatches() {
       const now = new Date();
       // Format today's date to match "08 Apr 2026" format
-      const todayStr = now.toLocaleDateString('en-GB', { day: '2d', month: 'short', year: 'numeric' });
+      const todayStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
       
       const todayMatch = d.matches.find(m => {
-        // If the date in JSON is like "08 Apr 2026", match it
-        return m.date === todayStr && !m.is_completed;
+        return (m.date === todayStr || m.is_today) && !m.is_completed;
       });
       
       const up = d.matches.filter(m => !m.is_completed && m.date !== todayStr);
