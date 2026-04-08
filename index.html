@@ -809,8 +809,18 @@
         const lres = await fetch('live_scores_2026.json?nocache=' + Date.now());
         live = await lres.json();
 
+        if (syncBtn && d.generated_at) {
+          syncBtn.innerHTML = `
+            <span style="width:6px;height:6px;border-radius:50%;background:#4ade80"></span>
+            Sync: ${d.generated_at}
+          `;
+        }
+
         renderAll();
-      } catch (e) { console.error("Sync failed", e); }
+      } catch (e) { 
+        console.error("Sync failed", e);
+        if (syncBtn) syncBtn.innerHTML = '<span style="width:6px;height:6px;border-radius:50%;background:#ef4444"></span> Sync Off';
+      }
 
       if (syncBtn) setTimeout(() => syncBtn.style.opacity = '1', 500);
     }
@@ -991,8 +1001,16 @@
     }
 
     function renderMatches() {
-      const todayMatch = d.matches.find(m => m.is_today && !m.is_completed);
-      const up = d.matches.filter(m => !m.is_completed && !m.is_today);
+      const now = new Date();
+      // Format today's date to match "08 Apr 2026" format
+      const todayStr = now.toLocaleDateString('en-GB', { day: '2d', month: 'short', year: 'numeric' });
+      
+      const todayMatch = d.matches.find(m => {
+        // If the date in JSON is like "08 Apr 2026", match it
+        return m.date === todayStr && !m.is_completed;
+      });
+      
+      const up = d.matches.filter(m => !m.is_completed && m.date !== todayStr);
       const comp = d.matches.filter(m => m.is_completed).reverse();
 
       // Highlight Today

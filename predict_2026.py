@@ -593,7 +593,7 @@ top_bowlers_list = sorted(
 )
 
 output = {
-    'generated_at':    datetime.now().strftime('%Y-%m-%d'),
+    'generated_at':    datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
     'model_accuracy':  round((rf_acc + gb_acc + lr_acc)/3*100, 1),
     'rf_accuracy':     round(rf_acc*100, 1),
     'gb_accuracy':     round(gb_acc*100, 1),
