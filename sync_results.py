@@ -116,30 +116,51 @@ def sync(simulate_live=False):
     new_data_found = False
 
     if soup:
+        # Improved selector for Cricbuzz match cards
         cards = soup.select('a.w-full.bg-cbWhite.flex.flex-col.p-3.gap-1')
+        if not cards: cards = soup.select('a[href*="/live-cricket-scores/"]')
         if not cards: cards = soup.select('a[href*="/cricket-scores/"]')
             
         for card in cards:
-            header_el = card.select_one('div:nth-of-type(1) > span')
-            if not header_el: continue
-            h_text = header_el.text.strip()
-            num_part = h_text.split('•')[0].strip().split()[0]
-            mno_str = "".join(filter(str.isdigit, num_part))
-            if not mno_str: continue
-            mno = int(mno_str)
+            # Try to get match number from text (e.g., "14th Match")
+            card_text = card.text.strip()
+            import re
+            mno_match = re.search(r'(\d+)(?:st|nd|rd|th)\s+Match', card_text)
+            if not mno_match: continue
+            mno = int(mno_match.group(1))
             
             if mno in existing_mno: continue
             
-            result_div = card.find_next_sibling('div')
-            result_text = result_div.text.strip() if result_div else ""
+            # Look for result text
+            result_text = ""
+            # Cricbuzz often puts the result in a sibling or child div
+            parent = card.parent
+            if parent:
+                res_el = parent.select_one('div.cb-text-complete, div.cb-text-abandoned')
+                if not res_el:
+                    # Alternative: check for text in the next sibling
+                    sibling = card.find_next_sibling('div')
+                    if sibling and ("won by" in sibling.text.lower() or "no result" in sibling.text.lower()):
+                        res_el = sibling
+                
+                if res_el:
+                    result_text = res_el.text.strip()
+            
+            # If still no result, check if it's in the link text or next line
+            if not result_text and ("won by" in card_text.lower() or "no result" in card_text.lower()):
+                # Try to extract the part after vs
+                result_parts = re.split(r'vs', card_text, flags=re.IGNORECASE)
+                if len(result_parts) > 1:
+                    # Dummy logic if precise parsing fails, but better than nothing
+                    result_text = card_text
+            
             if "won by" in result_text.lower() or "no result" in result_text.lower() or "abandoned" in result_text.lower():
-                team_spans = card.select('div:nth-of-type(2) > div > div > span')
-                score_spans = card.select('div:nth-of-type(2) > div > span')
-                if len(team_spans) >= 2:
-                    t1_name = clean_name(team_spans[0].text)
-                    t1_score = score_spans[0].text.strip() if len(score_spans) > 0 else "N/A"
-                    t2_name = clean_name(team_spans[1].text)
-                    t2_score = score_spans[1].text.strip() if len(score_spans) > 1 else "N/A"
+                # Extract teams
+                # In the markdown we saw "GT vs DC"
+                teams_match = re.search(r'([A-Za-z\s]+)\s+vs\s+([A-Za-z\s]+)', card_text)
+                if teams_match:
+                    t1_name = clean_name(teams_match.group(1).strip())
+                    t2_name = clean_name(teams_match.group(2).strip())
                     
                     winner = "None" if ("no result" in result_text.lower() or "abandoned" in result_text.lower()) else "Unknown"
                     if winner == "Unknown":
@@ -149,8 +170,8 @@ def sync(simulate_live=False):
                     
                     local_results.append({
                         "match_no": mno, "home": t1_name, "away": t2_name, "winner": winner,
-                        "home_score": t1_score if t1_score != t1_name else "N/A",
-                        "away_score": t2_score if t2_score != t1_name else "N/A",
+                        "home_score": "N/A", # Hard to parse from text without clear layout
+                        "away_score": "N/A",
                         "margin": result_text
                     })
                     new_data_found = True
@@ -175,14 +196,14 @@ def sync(simulate_live=False):
     with open(LIVE_JSON, 'w') as f:
         json.dump(live_scores, f, indent=2)
 
-    if new_data_found or (simulate_live or live_scores):
-        if new_data_found:
-            local_results = sorted(local_results, key=lambda x: x['match_no'])
-            with open(JSON_FILE, 'w') as f: json.dump(local_results, f, indent=2)
-        subprocess.run(["python3", PREDICT_SCRIPT])
-        print("  Update Success.")
-    else:
-        print("  Status: No updates.")
+    if new_data_found:
+        local_results = sorted(local_results, key=lambda x: x['match_no'])
+        with open(JSON_FILE, 'w') as f: json.dump(local_results, f, indent=2)
+    
+    # ALWAYS run prediction script to update today's status and generated_at
+    import sys
+    subprocess.run([sys.executable, PREDICT_SCRIPT])
+    print("  Update Success.")
 
 if __name__ == "__main__":
     import sys

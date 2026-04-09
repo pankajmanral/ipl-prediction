@@ -1001,13 +1001,20 @@
     }
 
     function renderMatches() {
+      // Get current date in IST
       const now = new Date();
-      // Format today's date to match "08 Apr 2026" format
-      const todayStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+      const istOffset = 5.5 * 60 * 60 * 1000;
+      const istNow = new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + istOffset);
       
-      const todayMatch = d.matches.find(m => {
-        return (m.date === todayStr || m.is_today) && !m.is_completed;
-      });
+      const todayStr = istNow.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+      
+      // Prioritize match that is actually today's date
+      let todayMatch = d.matches.find(m => m.date === todayStr && !m.is_completed);
+      
+      // If none found for today's date, fallback to the one marked is_today in JSON
+      if (!todayMatch) {
+          todayMatch = d.matches.find(m => m.is_today && !m.is_completed);
+      }
       
       const up = d.matches.filter(m => !m.is_completed && m.date !== todayStr);
       const comp = d.matches.filter(m => m.is_completed).reverse();

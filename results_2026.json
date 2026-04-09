@@ -10,5 +10,7 @@
   {"match_no": 9, "home": "Rajasthan Royals", "away": "Gujarat Titans", "winner": "Rajasthan Royals", "home_score": "210/6", "away_score": "204/8", "margin": "6 runs"},
   {"match_no": 10, "home": "Sunrisers Hyderabad", "away": "Lucknow Super Giants", "winner": "Lucknow Super Giants", "home_score": "156/9", "away_score": "160/5", "margin": "5 wkts"},
   {"match_no": 11, "home": "Royal Challengers Bengaluru", "away": "Chennai Super Kings", "winner": "Royal Challengers Bengaluru", "home_score": "250/3", "away_score": "207", "margin": "43 runs"},
-  {"match_no": 12, "home": "Kolkata Knight Riders", "away": "Punjab Kings", "winner": "None", "home_score": "25/2", "away_score": "DNB", "margin": "No result (due to rain)"}
+  {"match_no": 12, "home": "Kolkata Knight Riders", "away": "Punjab Kings", "winner": "None", "home_score": "25/2", "away_score": "DNB", "margin": "No result (due to rain)"},
+  {"match_no": 13, "home": "Rajasthan Royals", "away": "Mumbai Indians", "winner": "Rajasthan Royals", "home_score": "150/3", "away_score": "123/9", "margin": "RR won by 27 runs"},
+  {"match_no": 14, "home": "Delhi Capitals", "away": "Gujarat Titans", "winner": "Gujarat Titans", "home_score": "209/8", "away_score": "210/4", "margin": "GT won by 1 run"}
 ]
